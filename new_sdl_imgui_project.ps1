@@ -363,12 +363,19 @@ else()
 endif()
 
 # ---- Copy assets/ next to exe ----
-if (COPY_ASSETS)
-    add_custom_command(TARGET ${APP_TARGET} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-            "$<TARGET_FILE_DIR:${APP_TARGET}>/assets"
-    )
+if(COPY_ASSETS)
+    set(ASSETS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+
+    if(EXISTS "${ASSETS_DIR}" AND IS_DIRECTORY "${ASSETS_DIR}")
+        add_custom_command(TARGET ${APP_TARGET} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${ASSETS_DIR}"
+                "$<TARGET_FILE_DIR:${APP_TARGET}>/assets"
+            COMMENT "Copying assets -> $<TARGET_FILE_DIR:${APP_TARGET}>/assets"
+        )
+    else()
+        message(WARNING "COPY_ASSETS=ON but assets directory not found: ${ASSETS_DIR}")
+    endif()
 endif()
 '@
 
